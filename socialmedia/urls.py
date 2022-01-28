@@ -11,5 +11,5 @@ urlpatterns = [
     path("postcreate/",createPosts),
     path("register/", register),
     path("login/", user_login),
-    path('logout/', auth_views.LogoutView.as_view(template_name='login.html'), name='logout'),
+    path('logout/', auth_views.LogoutView.as_view(template_name='logout.html'), name='logout'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
