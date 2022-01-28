@@ -5,15 +5,13 @@ from xmlrpc.client import Boolean
 from django.shortcuts import render
 from .models import Post
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
-from django.shortcuts import redirect, render, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 # Create your views here.
 def index(request):
     context = {
-        'posts': Post.objects.all().order_by('-id'),
+        'posts': Post.objects.all().order_by('-id')[:20],
         'r': User.objects.filter(is_superuser=False)
     }
     return render(request, 'index.html', context)
@@ -30,7 +28,7 @@ def createPosts(request):
         else:
             return redirect('/')
     else:
-        return render(request,"createpost.html")
+        return render(request,"createPost.html")
 
 def register(request):
     if request.method == 'POST':
@@ -41,11 +39,16 @@ def register(request):
         password = request.POST['password']
         confirmpassword = request.POST['confirmpassword']
         if password == confirmpassword:
-            user = User(first_name=first_name,
+            print(password)
+            if User.objects.filter(username=username).exists():
+                return redirect('/')
+            else:
+                user = User.objects.create_user(first_name=first_name,
                         last_name=last_name, username=username, email=email, password=password)
-            user.save()
-            return redirect('/')
+                user.save()
+                return redirect('/')
         else:
+            print("password not equal")
             return redirect('/')
     else:
         return render(request, 'register.html')
@@ -57,14 +60,11 @@ def user_login(request):
         password = request.POST['password']
         user = authenticate(username=username, password=password)
         if user is not None:
-              if user.is_active:
-                  login(request, user)
-                  return HttpResponseRedirect("/")
-              else:
-                  # Return a 'disabled account' error message
-                  return redirect('/')
+            login(request, user)
+            return redirect('/')
         else:
-            return render(request, 'login.html')
+            print("user not found")
+            return render(request, 'register.html')
     else:
         # the login is a  GET request, so just show the user the login form.
         return render(request,'login.html')
