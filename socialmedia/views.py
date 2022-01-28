@@ -28,7 +28,7 @@ def createPosts(request):
         else:
             return redirect('/')
     else:
-        return render(request,"createPost.html")
+        return render(request,"createpost.html")
 
 def register(request):
     if request.method == 'POST':
